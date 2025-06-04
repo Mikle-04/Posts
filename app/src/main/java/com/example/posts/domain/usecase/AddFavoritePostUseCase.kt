@@ -7,5 +7,5 @@ import javax.inject.Inject
 class AddFavoritePostUseCase @Inject constructor(
     private val repository: PostRepository
 ) {
-    suspend operator fun invoke(post: PostEntity) = repository.addFavorite(post)
+   // suspend operator fun invoke(post: PostEntity) = repository.addFavorite(post)
 }
