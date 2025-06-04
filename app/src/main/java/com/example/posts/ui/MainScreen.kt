@@ -10,8 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.posts.data.model.Post
 import com.example.posts.presentation.PostViewModel
@@ -50,7 +48,14 @@ fun MainScreen(
             else -> {
                 PostList(
                     posts = state.posts,
-                    onFavoriteClick = { post -> viewModel.addToFavorites(post) },
+                    favourites = state.favourites,
+                    onFavoriteClick = { post ->
+                        if (state.favourites.any { it.id == post.id }) {
+                            viewModel.removeFavorite(post)
+                        } else {
+                            viewModel.addToFavorites(post)
+                        }
+                    },
                     modifier = Modifier.padding(padding)
                 )
             }
@@ -61,42 +66,17 @@ fun MainScreen(
 @Composable
 fun PostList(
     posts: List<Post>,
+    favourites: List<Post>,
     onFavoriteClick: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(posts) { post ->
-            PostItem(post = post, onFavoriteClick = { onFavoriteClick(post) })
-        }
-    }
-}
-
-@Composable
-fun PostItem(post: Post, onFavoriteClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+            PostItem(
+                post = post,
+                isFavorite = favourites.any { it.id == post.id },
+                onFavoriteClick = { onFavoriteClick(post) }
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = post.body,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 4,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onFavoriteClick) {
-                Text("Добавить в избранное")
-            }
         }
     }
 }

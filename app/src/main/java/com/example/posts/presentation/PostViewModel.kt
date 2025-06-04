@@ -1,5 +1,6 @@
 package com.example.posts.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.posts.data.model.Post
@@ -51,15 +52,25 @@ class PostViewModel @Inject constructor(
 
     fun addToFavorites(post: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addFavorite(post)
-            loadFavorites()
+            try {
+                repository.addFavorite(post)
+                Log.d("PostViewModel", "Added post ${post.id} to favorites")
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+                Log.e("PostViewModel", "Error adding favorite: ${e.message}")
+            }
         }
     }
 
     fun removeFavorite(post: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.removeFavorite(post)
-            loadFavorites()
+            try {
+                repository.removeFavorite(post)
+                Log.d("PostViewModel", "Removed post ${post.id} from favorites")
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+                Log.e("PostViewModel", "Error removing favorite: ${e.message}")
+            }
         }
     }
 }

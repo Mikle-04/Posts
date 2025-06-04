@@ -5,11 +5,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.posts.data.model.Post
 import com.example.posts.presentation.PostViewModel
@@ -50,7 +52,8 @@ fun FavoritesScreen(
             }
             else -> {
                 FavoritePostList(
-                    posts = state.favourites, // Исправлено: favoritePosts вместо favourites
+                    posts = state.favourites,
+                    onRemoveFavorite = { post -> viewModel.removeFavorite(post) },
                     modifier = Modifier.padding(padding)
                 )
             }
@@ -59,10 +62,18 @@ fun FavoritesScreen(
 }
 
 @Composable
-fun FavoritePostList(posts: List<Post>, modifier: Modifier = Modifier) {
+fun FavoritePostList(
+    posts: List<Post>,
+    onRemoveFavorite: (Post) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(posts) { post ->
-            PostItem(post = post, onFavoriteClick = {}) // Без действия, так как уже в избранном
+            PostItem(
+                post = post,
+                isFavorite = true,
+                onFavoriteClick = { onRemoveFavorite(post) }
+            )
         }
     }
 }
