@@ -7,5 +7,5 @@ import javax.inject.Inject
 class RemoveFavoritePostUseCase @Inject constructor(
    private val postsRepository: PostRepository)
 {
-    suspend operator fun invoke(post: PostEntity) = postsRepository.removeFavorite(post)
+   // suspend operator fun invoke(post: PostEntity) = postsRepository.removeFavorite(post)
 }

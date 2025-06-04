@@ -8,5 +8,5 @@ import javax.inject.Inject
 class GetFavoritePostsUseCase @Inject constructor(
     private val repository: PostRepository
 ) {
-    operator fun invoke(): Flow<List<PostEntity>> = repository.getFavoritePosts()
+  //  operator fun invoke(): Flow<List<PostEntity>> = repository.getFavoritePosts()
 }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     suspend fun getPosts(): List<Post>
-    fun getFavoritePosts(): Flow<List<PostEntity>>
-    suspend fun addFavorite(post: PostEntity)
-    suspend fun removeFavorite(post: PostEntity)
+    fun getFavoritePosts(): List<Post>
+    suspend fun addFavorite(post: Post)
+    suspend fun removeFavorite(post: Post)
 }

@@ -18,37 +18,36 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object PostModule {
 
     @Provides
     @Singleton
-    fun providePostApi() : PostApi{
-        return Retrofit.Builder()
+    fun provideRetrofit(): Retrofit =
+        Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(PostApi::class.java)
-    }
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
+    fun providePostApi(retrofit: Retrofit): PostApi =
+        retrofit.create(PostApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "posts_db"
+            "posts_database"
         ).build()
-    }
 
     @Provides
     @Singleton
-    fun providePostDao(database: AppDatabase): PostDao {
-        return database.postDao()
-    }
+    fun providePostDao(database: AppDatabase): PostDao = database.postDao()
 
     @Provides
     @Singleton
-    fun providePostRepository(postApi: PostApi, postDao: PostDao): PostRepository {
-        return PostRepositoryImpl(postApi, postDao)
-    }
+    fun providePostRepository(api: PostApi, dao: PostDao): PostRepository =
+        PostRepositoryImpl(api, dao)
 }
