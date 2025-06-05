@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.Dispatcher
 import javax.inject.Inject
@@ -29,49 +30,47 @@ class PostViewModel @Inject constructor(
 
     private fun loadPosts() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
             try {
+                _uiState.update {
+                    it.copy(isLoading = true)
+                }
                 val posts = repository.getPosts()
-                _uiState.value = _uiState.value.copy(posts = posts, isLoading = false)
+                _uiState.update {
+                    it.copy(posts = posts, isLoading = false)
+                }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message, isLoading = false)
+                _uiState.update {
+                    it.copy(error = e.message, isLoading = false)
+                }
             }
         }
     }
 
-    private fun loadFavorites() {
+     fun loadFavorites() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val favorites = repository.getFavoritePosts() // Предполагается, что возвращает List<Post>
-                _uiState.value = _uiState.value.copy(favourites = favorites)
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
+            _uiState.update {
+                it.copy(favourites = repository.getFavoritePosts())
             }
         }
     }
 
     fun addToFavorites(post: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.addFavorite(post)
-                Log.d("PostViewModel", "Added post ${post.id} to favorites")
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
-                Log.e("PostViewModel", "Error adding favorite: ${e.message}")
+            repository.addFavorite(post)
+            _uiState.update {
+                it.copy(favourites = repository.getFavoritePosts())
             }
         }
     }
 
     fun removeFavorite(post: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.removeFavorite(post)
-                Log.d("PostViewModel", "Removed post ${post.id} from favorites")
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
-                Log.e("PostViewModel", "Error removing favorite: ${e.message}")
+            repository.removeFavorite(post)
+            _uiState.update {
+                it.copy(favourites = repository.getFavoritePosts())
             }
         }
     }
 }
+
 
