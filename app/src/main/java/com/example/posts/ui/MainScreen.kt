@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,10 @@ fun MainScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val state = uiState.value
+
+    LaunchedEffect(Unit) {
+        viewModel.loadFavorites()
+    }
 
     Scaffold(
         topBar = {
