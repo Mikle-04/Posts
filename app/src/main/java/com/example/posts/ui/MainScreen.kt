@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.posts.data.model.Post
 import com.example.posts.presentation.PostViewModel
@@ -21,8 +23,7 @@ fun MainScreen(
     onNavigateToFavorites: () -> Unit,
     viewModel: PostViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.uiState.collectAsState()
-    val state = uiState.value
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadFavorites()
@@ -31,37 +32,36 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Посты") },
+                title = { Text("Посты", style = MaterialTheme.typography.headlineSmall) },
                 actions = {
                     IconButton(onClick = onNavigateToFavorites) {
-                        Icon(Icons.Default.Favorite, contentDescription = "Избранное")
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Избранное",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             )
         }
     ) { padding ->
-        when {
-            state.isLoading -> {
-                LoadingScreen(modifier = Modifier.padding(padding))
-            }
-            state.error != null -> {
-                ErrorScreen(
-                    errorMessage = state.error,
-                    modifier = Modifier.padding(padding)
-                )
-            }
-            else -> {
-                PostList(
-                    posts = state.posts,
-                    favourites = state.favourites,
+        Box(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()
+        ) {
+            when {
+                uiState.isLoading -> LoadingScreen()
+                uiState.error != null -> ErrorScreen(errorMessage = uiState.error)
+                else -> PostList(
+                    posts = uiState.posts,
+                    favourites = uiState.favourites,
                     onFavoriteClick = { post ->
-                        if (state.favourites.any { it.id == post.id }) {
+                        if (uiState.favourites.any { it.id == post.id }) {
                             viewModel.removeFavorite(post)
                         } else {
                             viewModel.addToFavorites(post)
                         }
-                    },
-                    modifier = Modifier.padding(padding)
+                    }
                 )
             }
         }
@@ -72,10 +72,12 @@ fun MainScreen(
 fun PostList(
     posts: List<Post>,
     favourites: List<Post>,
-    onFavoriteClick: (Post) -> Unit,
-    modifier: Modifier = Modifier
+    onFavoriteClick: (Post) -> Unit
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         items(posts) { post ->
             PostItem(
                 post = post,
