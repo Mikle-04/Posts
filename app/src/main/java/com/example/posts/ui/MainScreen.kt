@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.posts.data.model.Post
 import com.example.posts.presentation.PostViewModel
@@ -70,10 +72,12 @@ fun MainScreen(
 fun PostList(
     posts: List<Post>,
     favourites: List<Post>,
-    onFavoriteClick: (Post) -> Unit,
-    modifier: Modifier = Modifier
+    onFavoriteClick: (Post) -> Unit
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         items(posts) { post ->
             PostItem(
                 post = post,
